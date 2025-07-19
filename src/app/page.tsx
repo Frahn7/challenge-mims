@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { IconBook } from "../../public/iconBook";
 import { IconSearch } from "../../public/iconSearch";
 import { FontSelect } from "./components/font-select";
@@ -27,9 +27,14 @@ interface Definition {
   example?: string;
 }
 
+type SearchedWord = {
+  word: string;
+  date: string;
+};
+
 export default function Home() {
   const [words, setWords] = useState<WordsProps>();
-  const [searchedWords, setSearchedWords] = useState<string[]>([]);
+  const [searchedWords, setSearchedWords] = useState<SearchedWord[]>([]);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -47,8 +52,21 @@ export default function Home() {
             setWords(data[0]);
             if (searchedWords.length > 4) {
               searchedWords.shift();
-              setSearchedWords([...searchedWords, data[0].word]);
-            } else setSearchedWords([...searchedWords, data[0].word]);
+
+              const newWord = data[0].word;
+              const nowFormatted = new Date().toLocaleString();
+
+              setSearchedWords([
+                ...searchedWords,
+                { word: newWord, date: nowFormatted },
+              ]);
+            } else
+              setSearchedWords([
+                ...searchedWords,
+                { word: data[0].word, date: new Date().toLocaleString() },
+              ]);
+
+            localStorage.setItem("Searched", data[0].word);
           } else if (data.title) {
             toast.error(data.title);
           }
@@ -76,7 +94,10 @@ export default function Home() {
           <h3 className="font-bold text-2xl">Searched Words</h3>
           <div className=" flex flex-col-reverse">
             {searchedWords.map((word, i) => (
-              <p key={i}>{word}</p>
+              <p key={i}>
+                <span className="font-bold">{word.word}</span>
+                {word.date}
+              </p>
             ))}
           </div>
         </div>
