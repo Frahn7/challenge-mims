@@ -95,8 +95,7 @@ export default function Home() {
           <div className=" flex flex-col-reverse">
             {searchedWords.map((word, i) => (
               <p key={i}>
-                <span className="font-bold">{word.word}</span>
-                {word.date}
+                <span className="font-bold">{word.word}</span> {word.date}
               </p>
             ))}
           </div>

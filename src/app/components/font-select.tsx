@@ -16,7 +16,7 @@ export const FontSelect = () => {
 
   return (
     <Select defaultValue="serif" onValueChange={handleChange}>
-      <SelectTrigger className="w-[180px] cursor-pointer ">
+      <SelectTrigger className="w-[120px] cursor-pointer border-0 border-none">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
