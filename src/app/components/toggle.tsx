@@ -46,7 +46,6 @@ const Sun = () => {
 
 export const Toggle = () => {
   const { resolvedTheme, setTheme } = useTheme();
-  console.log(resolvedTheme);
 
   return (
     <div className="flex justify-center items-ceter ml-4 w-[40px] mt-2 ">

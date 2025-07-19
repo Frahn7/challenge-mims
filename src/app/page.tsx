@@ -1,4 +1,13 @@
 "use client";
+
+import { FormEventHandler, useState } from "react";
+import { IconBook } from "../../public/iconBook";
+import { IconSearch } from "../../public/iconSearch";
+import { FontSelect } from "./components/font-select";
+import { Toggle } from "./components/toggle";
+import { Word } from "./components/word";
+import { toast } from "sonner";
+
 interface WordsProps {
   meanings: Meaning[];
   phonetics: [];
@@ -18,16 +27,9 @@ interface Definition {
   example?: string;
 }
 
-import { FormEventHandler, useState } from "react";
-import { IconBook } from "../../public/iconBook";
-import { IconSearch } from "../../public/iconSearch";
-import { FontSelect } from "./components/font-select";
-import { Toggle } from "./components/toggle";
-import { Word } from "./components/word";
-import { toast } from "sonner";
-
 export default function Home() {
   const [words, setWords] = useState<WordsProps>();
+  const [searchedWords, setSearchedWords] = useState<string[]>([]);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -40,13 +42,28 @@ export default function Home() {
         `https://api.dictionaryapi.dev/api/v2/entries/en/${form.word.value}`
       )
         .then((res) => res.json())
-        .then((data) => setWords(data[0]));
-    } else toast.error("You must enter a word!");
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setWords(data[0]);
+            if (searchedWords.length > 4) {
+              searchedWords.shift();
+              setSearchedWords([...searchedWords, data[0].word]);
+            } else setSearchedWords([...searchedWords, data[0].word]);
+          } else if (data.title) {
+            toast.error(data.title);
+          }
+        })
+        .catch(() => {
+          toast.error("Network error or invalid response");
+        });
+    } else {
+      toast.error("You must enter a word!");
+    }
   };
 
   return (
-    <div className="flex mt-2 flex-col justify-center max-w-screen min-h-screen items-center gap-11">
-      <div className="w-[40%] flex flex-row justify-between">
+    <div className="flex mt-5 mb-5 flex-col justify-center max-w-screen min-h-screen items-center gap-11">
+      <div className="md:w-[40%] w-[80%] flex flex-row justify-between">
         <IconBook />
         <div className="flex flex-row justify-center items-center gap-6">
           <FontSelect />
@@ -54,23 +71,34 @@ export default function Home() {
           <Toggle />
         </div>
       </div>
+      {searchedWords.length > 0 && (
+        <div className="left-4 top-1/2 -translate-y-1/2 fixed hidden md:block">
+          <h3 className="font-bold text-2xl">Searched Words</h3>
+          <div className=" flex flex-col-reverse">
+            {searchedWords.map((word, i) => (
+              <p key={i}>{word}</p>
+            ))}
+          </div>
+        </div>
+      )}
       <form
-        className="w-full flex justify-center relative"
+        className="flex justify-center relative w-screen md:w-full"
         onSubmit={handleSubmit}
       >
         <input
           type="text"
           name="word"
-          className="bg-background border w-[40%] p-4 font-bold rounded-xl "
+          className="bg-background border md:w-[40%] w-[80%] p-4 font-bold rounded-xl "
           placeholder="Search..."
         />
         <button
           type="submit"
-          className="absolute right-[31%] top-1/2 -translate-y-1/2 cursor-pointer"
+          className="absolute md:right-[31%] right-[15%] top-1/2 -translate-y-1/2 cursor-pointer"
         >
           <IconSearch />
         </button>
       </form>
+
       {words && <Word word={words} />}
     </div>
   );
