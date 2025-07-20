@@ -81,9 +81,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col py-5 max-w-screen min-h-screen items-center gap-8">
-      {searchedWords.length > 0 && (
-        <SearchedWords searchedWords={searchedWords} />
-      )}
       <div className="md:w-[40%] w-[80%] flex flex-row justify-between">
         <IconBook />
         <div className="flex flex-row justify-center items-center gap-6">
@@ -94,6 +91,9 @@ export default function Home() {
       </div>
 
       <SearchForm handleSubmit={handleSubmit} />
+      {searchedWords.length > 0 && (
+        <SearchedWords searchedWords={searchedWords} />
+      )}
 
       {words && <Word word={words} />}
     </div>
