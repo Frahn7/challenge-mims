@@ -95,7 +95,7 @@ export const Word = ({ word }: { word: WordProps }) => {
       ))}
 
       {(word?.sourceUrls?.length ?? 0) > 0 && (
-        <div className="flex flex-row gap-2">
+        <div className="flex flex-row gap-2 ">
           <span className="text-gray-500">Source</span>
           <ul>
             {word?.sourceUrls?.map((url, k) => (
@@ -103,7 +103,7 @@ export const Word = ({ word }: { word: WordProps }) => {
                 key={k}
                 href={url}
                 target="_blank"
-                className="underline flex flex-row gap-2"
+                className="underline flex flex-row gap-2 "
               >
                 {url} <SquareArrowOutUpRight width={13} color="gray" />
               </Link>
