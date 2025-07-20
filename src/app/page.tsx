@@ -8,25 +8,7 @@ import { Word } from "./components/word";
 import { toast } from "sonner";
 import { SearchedWords } from "./components/searched-words";
 import { SearchForm } from "./components/search-form";
-
-interface Definition {
-  definition: string;
-  example?: string;
-}
-
-interface Meaning {
-  partOfSpeech: string;
-  definitions: Definition[];
-  synonyms: string[];
-}
-
-interface WordsProps {
-  meanings: Meaning[];
-  phonetics: [];
-  phonetic: string;
-  word: string;
-  sourceUrls: string[];
-}
+import { useLazyGetEntryByWordQuery } from "@/services/dictionary-api";
 
 type SearchedWord = {
   word: string;
@@ -34,8 +16,8 @@ type SearchedWord = {
 };
 
 export default function Home() {
-  const [words, setWords] = useState<WordsProps>();
   const [searchedWords, setSearchedWords] = useState<SearchedWord[]>([]);
+  const [trigger, { data }] = useLazyGetEntryByWordQuery();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -45,34 +27,31 @@ export default function Home() {
     };
 
     if (form.word.value.length > 0) {
-      fetch(
-        `https://api.dictionaryapi.dev/api/v2/entries/en/${form.word.value}`
-      )
-        .then((res) => res.json())
+      trigger(form.word.value)
+        .unwrap()
         .then((data) => {
-          if (Array.isArray(data)) {
-            setWords(data[0]);
-            if (searchedWords.length > 4) {
-              searchedWords.shift();
+          if (searchedWords.length > 4) {
+            searchedWords.shift();
 
-              const newWord = data[0].word;
-              const nowFormatted = new Date().toLocaleString();
+            const newWord = data[0].word;
+            const nowFormatted = new Date().toLocaleString();
 
-              setSearchedWords([
-                ...searchedWords,
-                { word: newWord, date: nowFormatted },
-              ]);
-            } else
-              setSearchedWords([
-                ...searchedWords,
-                { word: data[0].word, date: new Date().toLocaleString() },
-              ]);
-          } else if (data.title) {
-            toast.error(data.title);
-          }
+            setSearchedWords([
+              ...searchedWords,
+              { word: newWord, date: nowFormatted },
+            ]);
+          } else
+            setSearchedWords([
+              ...searchedWords,
+              { word: data[0].word, date: new Date().toLocaleString() },
+            ]);
         })
-        .catch(() => {
-          toast.error("Network error or invalid response");
+        .catch((err) => {
+          if (err.data.title) {
+            toast.error(err.data.title);
+          } else {
+            toast.error("Error");
+          }
         });
     } else {
       toast.error("You must enter a word!");
@@ -95,7 +74,7 @@ export default function Home() {
         <SearchedWords searchedWords={searchedWords} />
       )}
 
-      {words && <Word word={words} />}
+      {Array.isArray(data) && <Word word={data[0]} />}
     </div>
   );
 }
