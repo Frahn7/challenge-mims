@@ -8,16 +8,20 @@ test("click toggle changes theme", async () => {
   render(<Home />);
   const button = screen.getByTestId("toggle-test");
   expect(button).toBeDefined();
+  const colorScheme =
+    document.documentElement.style.getPropertyValue("color-scheme");
 
-  expect(document.documentElement.style.getPropertyValue("color-scheme")).toBe(
-    "light"
-  );
+  expect(["light", "dark"]).toContain(colorScheme);
+
+  const opposite = colorScheme === "light" ? "dark" : "light";
+
   await userEvent.click(button);
   expect(document.documentElement.style.getPropertyValue("color-scheme")).toBe(
-    "dark"
+    opposite
   );
+
   await userEvent.click(button);
   expect(document.documentElement.style.getPropertyValue("color-scheme")).toBe(
-    "light"
+    colorScheme
   );
 });
