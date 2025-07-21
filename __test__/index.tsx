@@ -1,19 +1,9 @@
 import React, { ReactElement } from "react";
 import { render, RenderOptions } from "@testing-library/react";
-import { Toaster } from "@/app/components/ui/sonner";
-import { ThemeProvider } from "../src/app/components/ui/theme-provider";
+import { Providers } from "@/app/components/providers";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="light"
-      disableTransitionOnChange
-    >
-      {children}
-      <Toaster richColors />
-    </ThemeProvider>
-  );
+  return <Providers>{children}</Providers>;
 };
 
 const customRender = (

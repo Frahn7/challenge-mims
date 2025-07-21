@@ -3,14 +3,9 @@ import { render } from "./index";
 import Home from "@/app/page";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Providers } from "@/app/components/providers";
 
 test("click toggle changes theme", async () => {
-  render(
-    <Providers>
-      <Home />
-    </Providers>
-  );
+  render(<Home />);
   const button = screen.getByTestId("toggle-test");
   expect(button).toBeDefined();
   const colorScheme =
